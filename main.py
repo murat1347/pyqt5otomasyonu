@@ -76,30 +76,6 @@ class InsertDialog(QDialog):  # personel ekleme diaglogu
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Hata', 'Kişi database eklenemedi.')
 
-    def updatepersonal(self):  # personel güncelleme dialog
-
-        isim = ""
-        dep = ""
-        telefon = ""
-        adres = ""
-
-        isim = self.nameinput.text()
-        dep = self.branchinput.itemText(self.branchinput.currentIndex())
-        telefon = self.mobileinput.text()
-        adres = self.addressinput.text()
-        try:
-            self.conn = sqlite3.connect("database.db")
-            self.c = self.conn.cursor()
-            self.c.execute("INSERT INTO personal (isim,dep,telefon,adres) VALUES (?,?,?,?)",
-                           (isim, dep, telefon, adres))
-            self.conn.commit()
-            self.c.close()
-            self.conn.close()
-            QMessageBox.information(QMessageBox(), 'Başarılı', 'Kişi database eklendi.')
-            self.close()
-        except Exception:
-            QMessageBox.warning(QMessageBox(), 'Hata', 'Kişi database eklenemedi.')
-
 class Updatepersonal(QDialog):
     def __init__(self, *args, **kwargs):
         super(InsertDialog, self).__init__(*args, **kwargs)
@@ -132,9 +108,6 @@ class Updatepersonal(QDialog):
         self.setWindowTitle("Kişi Bilgisi Ekle")
         self.setFixedWidth(300)
         self.setFixedHeight(300)
-
-        self.QBtn.clicked.connect(self.updatepersonal)
-
         layout = QVBoxLayout()
 
         self.nameinput = QLineEdit()
@@ -163,10 +136,6 @@ class Updatepersonal(QDialog):
 
     def updatepersonal(self):  # personel eklme fonksiyonu
 
-        isim = ""
-        dep = ""
-        telefon = ""
-        adres = ""
         updaterol = self.updateinput.text()
         isim = self.nameinput.text()
         dep = self.branchinput.itemText(self.branchinput.currentIndex())
