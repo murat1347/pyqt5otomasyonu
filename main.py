@@ -76,39 +76,28 @@ class InsertDialog(QDialog):  # personel ekleme diaglogu
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Hata', 'Kişi database eklenemedi.')
 
+
 class Updatepersonal(QDialog):
     def __init__(self, *args, **kwargs):
-        super(InsertDialog, self).__init__(*args, **kwargs)
-
-
+        super(Updatepersonal, self).__init__(*args, **kwargs)
         self.QBtn = QPushButton()
-        self.QBtn.setText("Ara")
+        self.QBtn.setText("Kayıt")
 
-        self.setWindowTitle("Kişi Ara")
-        self.setFixedWidth(300)
-        self.setFixedHeight(100)
-        self.QBtn.clicked.connect(self.updatepersonal)
-        layout = QVBoxLayout()
-
-        self.updatepersonal= QLineEdit()
-        self.onlyInt = QIntValidator()
-        self.updatepersonal.setValidator(self.onlyInt)
-        self.updatepersonal.setPlaceholderText("ID")
-        layout.addWidget(self.updatepersonal)
-        layout.addWidget(self.QBtn)
-        self.setLayout(layout)
-
-        self.QBtn = QPushButton()
-        self.QBtn.setText("Güncelle")
-
-        self.setWindowTitle("Kişi Güncelle")
+        self.setWindowTitle("Kişi Ekle")
         self.setFixedWidth(300)
         self.setFixedHeight(300)
 
         self.setWindowTitle("Kişi Bilgisi Ekle")
         self.setFixedWidth(300)
         self.setFixedHeight(300)
+
+        self.QBtn.clicked.connect(self.updatepersonal2)
+
         layout = QVBoxLayout()
+
+        self.idinput = QLineEdit()
+        self.idinput.setPlaceholderText("id")
+        layout.addWidget(self.idinput)
 
         self.nameinput = QLineEdit()
         self.nameinput.setPlaceholderText("İsim")
@@ -134,9 +123,10 @@ class Updatepersonal(QDialog):
         layout.addWidget(self.QBtn)
         self.setLayout(layout)
 
-    def updatepersonal(self):  # personel eklme fonksiyonu
 
-        updaterol = self.updateinput.text()
+    def updatepersonal2(self):  # personel eklme fonksiyonu
+
+        updaterol = self.idinput.text()
         isim = self.nameinput.text()
         dep = self.branchinput.itemText(self.branchinput.currentIndex())
         telefon = self.mobileinput.text()
@@ -144,7 +134,7 @@ class Updatepersonal(QDialog):
         try:
             self.conn = sqlite3.connect("database.db")
             self.c = self.conn.cursor()
-            self.c.execute("UPDATE personal SET isim,dep,telefon,adres WHERE roll=" + str(updaterol))
+            self.c.execute("UPDATE personal SET isim='%s',dep='%s',telefon='%s',adres='%s' WHERE roll='%s'"%(isim,dep,telefon,adres,updaterol))
             self.conn.commit()
             self.c.close()
             self.conn.close()
@@ -152,6 +142,8 @@ class Updatepersonal(QDialog):
             self.close()
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Hata', 'Kişi database eklenemedi.')
+
+
 class SearchDialog(QDialog):  # arama diaglogu arama fonk cagırılıyor.
     def __init__(self, *args, **kwargs):
         super(SearchDialog, self).__init__(*args, **kwargs)
@@ -190,6 +182,7 @@ class SearchDialog(QDialog):  # arama diaglogu arama fonk cagırılıyor.
             self.conn.close()
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Hata', 'Kullanıcı databasede değil !')
+
 
 class DeleteDialog(QDialog):  # personel silme diaglogu personel silme fonk cagırıyoruz.
     def __init__(self, *args, **kwargs):
@@ -265,7 +258,8 @@ class MainWindow(QMainWindow):
 
         self.conn = sqlite3.connect("database.db")
         self.c = self.conn.cursor()
-        self.c.execute("CREATE TABLE IF NOT EXISTS personal(roll INTEGER PRIMARY KEY AUTOINCREMENT ,isim TEXT,dep TEXT,telefon INTEGER,adres TEXT)")
+        self.c.execute(
+            "CREATE TABLE IF NOT EXISTS personal(roll INTEGER PRIMARY KEY AUTOINCREMENT ,isim TEXT,dep TEXT,telefon INTEGER,adres TEXT)")
         self.c.close()
 
         file_menu = self.menuBar().addMenu("&Dosya")
@@ -314,6 +308,11 @@ class MainWindow(QMainWindow):
         btn_ac_delete.setStatusTip("Kişi Sil")
         toolbar.addAction(btn_ac_delete)
 
+        btn_ac_update = QAction(QIcon("icon/p1.png"), "Update", self)
+        btn_ac_update.triggered.connect(self.update)
+        btn_ac_update.setStatusTip("Kişi Güncelle")
+        toolbar.addAction(btn_ac_update)
+
         adduser_action = QAction(QIcon("icon/add1.jpg"), "Kişi Ekle", self)
         adduser_action.triggered.connect(self.insert)
         file_menu.addAction(adduser_action)
@@ -330,9 +329,6 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.about)
         help_menu.addAction(about_action)
 
-        update_action = QAction(QIcon("icon/i1.png"), "update", self)  # info icon
-        update_action.triggered.connect(self.update)
-        help_menu.addAction(update_action)
 
     def loaddata(self):
         self.connection = sqlite3.connect("database.db")  # sayfa yenileme fonksiyonu
@@ -345,29 +341,28 @@ class MainWindow(QMainWindow):
                 self.tableWidget.setItem(row_number, column_number, QTableWidgetItem(str(data)))
         self.connection.close()
 
-
     def insert(self):  # ekle fonksiyonunda ınsert diaglogu cagırıyoruz
         dlg = InsertDialog()
         dlg.exec_()
-
 
     def delete(self):  # sil fonksiyonunda delete diaglogu cagırıyoruz
         dlg = DeleteDialog()
         dlg.exec_()
 
-
     def search(self):  # arama fonksiyonunda search diaglogu cagırıyoruz
         dlg = SearchDialog()
         dlg.exec_()
 
+    def update(self):  # update fonksiyonunda hakkımda diaglogu cagırıyoruz
+        dlg = Updatepersonal()
+        dlg.exec_()
 
     def about(self):  # hakkımda fonksiyonunda hakkımda diaglogu cagırıyoruz
         dlg = AboutDialog()
         dlg.exec_()
 
-    def update(self):  # hakkımda fonksiyonunda hakkımda diaglogu cagırıyoruz
-        dlg = Updatepersonal()
-        dlg.exec_()
+
+
 
 app = QApplication(sys.argv)
 if (QDialog.Accepted == True):  # ekrana form nesnesi olusturup döngüye sokuyoruz.
