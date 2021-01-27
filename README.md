@@ -5,4 +5,5 @@
 ![Screenshot_1](https://user-images.githubusercontent.com/17177508/106054349-f0a06280-60fc-11eb-8c58-63000e640375.jpg)
 ![Screenshot_2](https://user-images.githubusercontent.com/17177508/106054350-f138f900-60fc-11eb-823f-5c6d8bcd1fe1.jpg)
 
-> pip install
+> pip install QtWebEngineWidgets
+> python install python 3.7 +
